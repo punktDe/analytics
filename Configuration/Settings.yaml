@@ -1,0 +1,20 @@
+PunktDe:
+  Analytics:
+    elasticsearch:
+      server:
+        host: elasticsearch
+        port: 9200
+        scheme: http
+        user: elastic
+        pass: '%env:ELASTIC_PASSWORD%'
+      indexConfiguration: []
+
+    kibana:
+      server:
+        host: kibana
+        port: 5601
+        scheme: http
+        user: elastic
+        pass: '%env:ELASTIC_PASSWORD%'
+
+    internalCustomerIds: [15231]

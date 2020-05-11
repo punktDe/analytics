@@ -1,0 +1,12 @@
+Neos:
+  Flow:
+    persistence:
+      backendOptions:
+        host: 'mariadb'
+        dbname: 'analytics'
+        user: 'analytics'
+        password: 'analytics'
+
+    error:
+      debugger:
+        recursionLimit: 20
