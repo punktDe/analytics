@@ -50,6 +50,8 @@ class ElasticsearchService
      */
     public function recreateElasticIndex(string $indexName): void
     {
+        $this->logger->info(sprintf('Recreating index %s', $indexName), LogEnvironment::fromMethodName(__METHOD__));
+
         $this->validateIndexConfiguration($indexName);
         $templateName = $indexName . '_template';
 
@@ -58,10 +60,14 @@ class ElasticsearchService
             'body' => $this->indexConfigurations[$indexName]
         ]);
 
+        $this->logger->info(sprintf('Successfully transferred template %s', $templateName), LogEnvironment::fromMethodName(__METHOD__));
+        $indexPattern = $indexName . '*';
+
         try {
-            $this->getClient()->indices()->delete(['index' => $indexName . '*']);
+            $this->getClient()->indices()->delete(['index' => $indexPattern]);
+            $this->logger->info(sprintf('Successfully removed indices with pattern %s', $indexPattern), LogEnvironment::fromMethodName(__METHOD__));
         } catch (Missing404Exception $exception) {
-            $this->logger->info(sprintf('Index %s could not be removed as it is not found', $indexName), LogEnvironment::fromMethodName(__METHOD__));
+            $this->logger->info(sprintf('Index with pattern %s could not be removed as it is not found', $indexPattern), LogEnvironment::fromMethodName(__METHOD__));
         }
     }
 
