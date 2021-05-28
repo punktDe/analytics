@@ -8,10 +8,12 @@ namespace PunktDe\Analytics\Persistence;
  *  All rights reserved.
  */
 
+use Doctrine\ORM\EntityManager;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\ObjectManagement\Exception\UnknownObjectException;
+use Psr\Log\LoggerInterface;
 
-abstract class AbstractRepository
+abstract class AbstractRepository implements RepositoryInterface
 {
     /**
      * @Flow\Inject
@@ -25,6 +27,12 @@ abstract class AbstractRepository
     protected $dataSource;
 
     /**
+     * @Flow\Inject
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * @throws UnknownObjectException
      * @throws \Neos\Flow\Configuration\Exception\InvalidConfigurationTypeException
      * @throws \Neos\Flow\ObjectManagement\Exception\CannotBuildObjectException
@@ -32,6 +40,11 @@ abstract class AbstractRepository
     public function initializeObject(): void
     {
         $this->dataSource = $this->dataSourceFactory->getInstance($this->getDataSourceName());
+    }
+
+    public function getEntityManager(): EntityManager
+    {
+        return $this->dataSource->getEntityManager();
     }
 
     /**
