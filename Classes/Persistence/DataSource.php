@@ -73,6 +73,11 @@ final class DataSource
 
         $this->entityManagerFactory->injectSettings(['persistence' => $this->persistenceConfiguration[$this->selectedDatabase]]);
         $this->entityManager = $this->entityManagerFactory->create();
+
+        if ($this->entityManager->getConnection()->getDatabasePlatform()->getName() === 'mysql') {
+            $this->entityManager->getConnection()->getWrappedConnection()->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
+        }
+
         $this->connection = $this->entityManager->getConnection();
 
         return $this;
