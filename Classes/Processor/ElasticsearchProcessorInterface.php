@@ -11,8 +11,8 @@ interface ElasticsearchProcessorInterface
 {
     /**
      * @param array $record
-     * @param string $indexName
+     * @param string $indexPrefix
      * @return array|null
      */
-    public function convertRecordToDocument(array $record, string $indexName): ?array;
+    public function convertRecordToDocument(array $record, string $indexPrefix): ?array;
 }
