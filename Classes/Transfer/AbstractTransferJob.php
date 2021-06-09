@@ -105,7 +105,8 @@ class AbstractTransferJob
             if ($this->counter % $this->logEvery === 0 || $summary) {
                 $secondsUsed = time() - $this->lastStatsDate;
                 $rate = $secondsUsed > 0 ? number_format($this->logEvery / $secondsUsed, 2, '.', '') : '~';
-                $this->logger->info(sprintf('Imported %s %s records in %s seconds (%s per second), Total: %s, Memory Usage: %s Mb', $this->logEvery, $this->jobName, $secondsUsed, $rate, $this->counter, memory_get_usage(true) / 1024 / 1024), LogEnvironment::fromMethodName(__METHOD__));
+                $importedWithThisBatch = $this->counter % $this->logEvery === 0 ? $this->logEvery : $this->counter % $this->logEvery;
+                $this->logger->info(sprintf('Imported %s %s records in %s seconds (%s per second), Total: %s, Memory Usage: %s Mb', $importedWithThisBatch, $this->jobName, $secondsUsed, $rate, $this->counter, memory_get_usage(true) / 1024 / 1024), LogEnvironment::fromMethodName(__METHOD__));
                 $this->lastStatsDate = time();
             }
         } catch (\Exception $e) {
@@ -142,8 +143,12 @@ class AbstractTransferJob
 
         $result = $this->index->bulk($this->bulkIndexStorage);
 
+        if (count($this->bulkIndexStorage['body']) / 2 !== count($result['items'])) {
+            $this->logger->error(sprintf('Bulk Request sent %s items but received %s acks', count($this->bulkIndexStorage['body']) / 2, count($result['items'])), LogEnvironment::fromMethodName(__METHOD__));
+        }
+
         foreach ($result['items'] as $resultDocument) {
-            if ($resultDocument['index']['_shards']['failed'] !== 0) {
+            if ($resultDocument['index']['_shards']['failed'] ?? 1 !== 0) {
                 $this->logger->error(sprintf('Ingesting a document in Elasticsearch failed. Details: %s', json_encode($resultDocument, JSON_THROW_ON_ERROR)));
             }
         }
