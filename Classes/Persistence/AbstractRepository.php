@@ -9,6 +9,8 @@ namespace PunktDe\Analytics\Persistence;
  */
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query\ResultSetMapping;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\ObjectManagement\Exception\UnknownObjectException;
 use Psr\Log\LoggerInterface;
@@ -45,6 +47,22 @@ abstract class AbstractRepository implements RepositoryInterface
     public function getEntityManager(): EntityManager
     {
         return $this->dataSource->getEntityManager();
+    }
+
+    protected function buildRsmByQuery(string $query): ResultSetMapping
+    {
+        $query .= PHP_EOL . 'LIMIT 1';
+
+        $statement = $this->dataSource->getConnection()->prepare($query);
+        $statement->executeStatement();
+        $firstRow = $statement->fetchAssociative();
+
+        $rsm = new ResultSetMappingBuilder($this->dataSource->getEntityManager());
+        foreach (array_keys($firstRow) as $field ) {
+            $rsm->addScalarResult($field, $field);
+        }
+
+        return $rsm;
     }
 
     /**
