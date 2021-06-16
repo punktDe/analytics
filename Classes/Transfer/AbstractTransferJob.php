@@ -80,7 +80,7 @@ class AbstractTransferJob
      * @param RepositoryInterface $repository
      * @param IterableResult $iterableResult
      */
-    public function transferGeneric(RepositoryInterface $repository, IterableResult $iterableResult): void
+    public function transferGeneric(IterableResult $iterableResult): void
     {
         $index = $this->index->getName();
         $this->logger->info(sprintf('Transferring Data from %s', $this->jobName), LogEnvironment::fromMethodName(__METHOD__));
