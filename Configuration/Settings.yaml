@@ -18,3 +18,14 @@ PunktDe:
         pass: '%env:ELASTIC_PASSWORD%'
 
     internalCustomerIds: [15231]
+
+#     example config for nextcloud
+#     nextcloud:
+#      example:
+#        baseUri: 'https://nextcloud.url/remote.php/webdav/'
+#        pathPrefix: '/remote.php/webdav'
+#        userName: 'username'
+#        password: 'password'
+#        authType: 1
+#        sourcePath: '/path/to/files'
+#        temporaryImportDirectoryName: 'example'
