@@ -8,13 +8,13 @@ namespace PunktDe\Analytics\Transfer;
  *  All rights reserved.
  */
 
-use Doctrine\ORM\Internal\Hydration\IterableResult;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Log\Utility\LogEnvironment;
 use Psr\Log\LoggerInterface;
 use PunktDe\Analytics\Elasticsearch\IndexInterface;
-use PunktDe\Analytics\Persistence\RepositoryInterface;
 use PunktDe\Analytics\Processor\ElasticsearchProcessorInterface;
+use Iterator;
+use JsonException;
 
 class AbstractTransferJob
 {
@@ -77,17 +77,18 @@ class AbstractTransferJob
     }
 
     /**
-     * @param RepositoryInterface $repository
-     * @param IterableResult $iterableResult
+     * @param Iterator $iterator
+     * @throws JsonException
      */
-    public function transferGeneric(IterableResult $iterableResult): void
+    public function transferGeneric(Iterator $iterator): void
     {
-        $index = $this->index->getName();
         $this->logger->info(sprintf('Transferring Data from %s', $this->jobName), LogEnvironment::fromMethodName(__METHOD__));
 
-        foreach ($iterableResult as $iteration) {
-            $record = current($iteration);
-            $this->autoBulkIndex($this->processor->convertRecordToDocument($record, $index));
+        foreach ($iterator as $record) {
+            if (isset($record[0])) {
+                $record = current($record);
+            }
+            $this->autoBulkIndex($this->processor->convertRecordToDocument($record, $this->index->getName()));
             $this->logStats();
         }
 
