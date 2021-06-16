@@ -147,7 +147,11 @@ class NextCloudClient
             }
         }
         if (!empty($missingConfigKeys)) {
-            $logMessage = sprintf('Could not parse nextcloud configuration. Keys %s are missing in namespace %s', implode(', ', $missingConfigKeys), $this->configurationNamespace);
+            if (count($missingConfigKeys) === 1) {
+                $logMessage = sprintf('Could not parse nextcloud configuration. Key %s is missing or empty in namespace %s', implode(', ', $missingConfigKeys), $this->configurationNamespace);
+            } else {
+                $logMessage = sprintf('Could not parse nextcloud configuration. Keys %s are missing or empty in namespace %s', implode(', ', $missingConfigKeys), $this->configurationNamespace);
+            }
             $this->logger->error($logMessage, LogEnvironment::fromMethodName(__METHOD__));
             throw new ConfigurationException($logMessage, 1623833587);
         }
