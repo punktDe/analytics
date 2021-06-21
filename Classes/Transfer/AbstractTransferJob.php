@@ -78,17 +78,26 @@ class AbstractTransferJob
 
     /**
      * @param Iterator $iterator
+     * @param bool $unWarpDoctrineArray
      * @throws JsonException
      */
-    public function transferGeneric(Iterator $iterator): void
+    public function transferGeneric(Iterator $iterator, bool $unWarpDoctrineArray = false): void
     {
         $this->logger->info(sprintf('Transferring Data from %s', $this->jobName), LogEnvironment::fromMethodName(__METHOD__));
 
         foreach ($iterator as $record) {
-            if (isset($record[0])) {
+            if ($unWarpDoctrineArray) {
+                // Actually intended, see https://github.com/doctrine/orm/issues/5287
                 $record = current($record);
             }
-            $this->autoBulkIndex($this->processor->convertRecordToDocument($record, $this->index->getName()));
+
+            try {
+                $this->autoBulkIndex($this->processor->convertRecordToDocument($record, $this->index->getName()));
+            } catch (\Exception $exception) {
+                $this->logger->error(sprintf('Error while converting / transferring a record to elastic. Error %s on record %s', $exception->getMessage(), json_encode($record, JSON_THROW_ON_ERROR)), LogEnvironment::fromMethodName(__METHOD__));
+                throw $exception;
+            }
+
             $this->logStats();
         }
 
