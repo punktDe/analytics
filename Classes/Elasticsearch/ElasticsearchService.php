@@ -13,7 +13,9 @@ use Neos\Flow\Annotations as Flow;
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
 use Neos\Flow\Log\Utility\LogEnvironment;
+use Neos\Flow\Reflection\ReflectionService;
 use Psr\Log\LoggerInterface;
+use PunktDe\Analytics\Elasticsearch\IndexConfiguration\IndexConfigurationPostProcessorInterface;
 
 /**
  * @Flow\Scope("singleton")
@@ -44,6 +46,12 @@ class ElasticsearchService
     protected $logger;
 
     /**
+     * @Flow\Inject
+     * @var ReflectionService
+     */
+    protected $reflectionService;
+
+    /**
      * Empty the elasticsearch data for the given index.
      * @param string $indexName
      * @throws \Exception
@@ -52,12 +60,11 @@ class ElasticsearchService
     {
         $this->logger->info(sprintf('Recreating index %s', $indexName), LogEnvironment::fromMethodName(__METHOD__));
 
-        $this->validateIndexConfiguration($indexName);
         $templateName = $indexName . '_template';
 
         $this->getClient()->indices()->putTemplate([
             'name' => $templateName,
-            'body' => $this->indexConfigurations[$indexName]
+            'body' => $this->getIndexConfiguration($indexName)
         ]);
 
         $this->logger->info(sprintf('Successfully transferred template %s', $templateName), LogEnvironment::fromMethodName(__METHOD__));
@@ -102,9 +109,10 @@ class ElasticsearchService
 
     /**
      * @param string $indexName
+     * @return array
      * @throws \Exception
      */
-    private function validateIndexConfiguration(string $indexName): void
+    private function getIndexConfiguration(string $indexName): array
     {
         if (!is_array($this->indexConfigurations)) {
             throw new \Exception('Index configuration must be an array but is ' . var_export($this->indexConfigurations, 1), 1569760272);
@@ -113,5 +121,18 @@ class ElasticsearchService
         if (!isset($this->indexConfigurations[$indexName])) {
             throw new \Exception(sprintf('Index configuration %s not found, available are %s', $indexName, implode(', ', array_keys($this->indexConfigurations))), 1569760142);
         }
+
+        $indexConfiguration = $this->indexConfigurations[$indexName];
+        $indexConfigurationPostProcessorClasses = $this->reflectionService->getAllImplementationClassNamesForInterface(IndexConfigurationPostProcessorInterface::class);
+
+        foreach ($indexConfigurationPostProcessorClasses as $configurationPostProcessorClass) {
+            if ($configurationPostProcessorClass::isSuitableFor($indexName)) {
+                /** @var IndexConfigurationPostProcessorInterface $configurationPostProcessor */
+                $configurationPostProcessor = new $configurationPostProcessorClass();
+                $indexConfiguration = $configurationPostProcessor->process($indexConfiguration);
+            }
+        }
+
+        return $indexConfiguration;
     }
 }

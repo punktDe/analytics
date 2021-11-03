@@ -94,7 +94,7 @@ class AbstractTransferJob
             try {
                 $this->autoBulkIndex($this->processor->convertRecordToDocument($record, $this->index->getName()));
             } catch (\Exception $exception) {
-                $this->logger->error(sprintf('Error while converting / transferring a record to elastic. Error %s on record %s', $exception->getMessage(), json_encode($record, JSON_THROW_ON_ERROR)), LogEnvironment::fromMethodName(__METHOD__));
+                $this->logger->error(sprintf('Error while converting / transferring a record to elastic. Error %s on record %s', $exception->getMessage(), json_encode($record)), LogEnvironment::fromMethodName(__METHOD__));
                 throw $exception;
             }
 
