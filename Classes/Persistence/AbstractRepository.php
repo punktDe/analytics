@@ -49,16 +49,27 @@ abstract class AbstractRepository implements RepositoryInterface
         return $this->dataSource->getEntityManager();
     }
 
+    /**
+     * @param string $query
+     * @return ResultSetMapping
+     * @throws EmptyResultException
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
     protected function buildRsmByQuery(string $query): ResultSetMapping
     {
         $query .= PHP_EOL . 'LIMIT 1';
 
         $statement = $this->dataSource->getConnection()->prepare($query);
-        $statement->executeStatement();
-        $firstRow = $statement->fetchAssociative();
+        $result = $statement->executeQuery();
+        $firstRow = $result->fetchAssociative();
+
+        if ($firstRow === false) {
+            throw new EmptyResultException('No Data was returned', 1637241365);
+        }
 
         $rsm = new ResultSetMappingBuilder($this->dataSource->getEntityManager());
-        foreach (array_keys($firstRow) as $field ) {
+        foreach (array_keys($firstRow) as $field) {
             $rsm->addScalarResult($field, $field);
         }
 

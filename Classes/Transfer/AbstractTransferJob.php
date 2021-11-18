@@ -34,7 +34,7 @@ class AbstractTransferJob
     /**
      * @var int
      */
-    private $counter;
+    protected $counter;
 
     /**
      * @var int
