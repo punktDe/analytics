@@ -128,6 +128,14 @@ class NextCloudClient
     }
 
     /**
+     * @return string[]
+     */
+    public function getDownloadedFilePaths(): array
+    {
+        return Files::readDirectoryRecursively($this->temporaryImportDirectory);
+    }
+
+    /**
      * @throws ConfigurationException
      */
     protected function validateConfiguration(): void
