@@ -4,7 +4,7 @@
     "name": "punktde/analytics",
     "require": {
         "neos/flow": "*",
-        "elasticsearch/elasticsearch": "^7.0",
+        "elasticsearch/elasticsearch": ">= 7.0",
         "league/flysystem-webdav": "*"
     },
     "autoload": {
