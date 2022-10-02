@@ -130,6 +130,7 @@ class AbstractTransferJob
 
     /**
      * @param array $document
+     * @throws JsonException
      */
     protected function autoBulkIndex(array $document): void
     {

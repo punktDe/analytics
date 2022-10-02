@@ -40,13 +40,13 @@ class EmployeeCollection extends ArrayCollection
     }
 
     /**
-     * @param int $timetrackingEmployeeId
+     * @param int $timeTrackingEmployeeId
      * @return Employee
      */
-    public function getByTimetrackingEmployeeId(int $timetrackingEmployeeId): ?Employee
+    public function getByTimeTrackingEmployeeId(int $timeTrackingEmployeeId): ?Employee
     {
-        if (isset($this->timetrackingEmployeeIdIndex[$timetrackingEmployeeId])) {
-            return $this->get($this->timetrackingEmployeeIdIndex[$timetrackingEmployeeId]);
+        if (isset($this->timetrackingEmployeeIdIndex[$timeTrackingEmployeeId])) {
+            return $this->get($this->timetrackingEmployeeIdIndex[$timeTrackingEmployeeId]);
         }
         return null;
     }
