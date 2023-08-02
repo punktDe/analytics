@@ -112,7 +112,7 @@ class ElasticsearchService
      * @return array
      * @throws \Exception
      */
-    private function getIndexConfiguration(string $indexName): array
+    public function getIndexConfiguration(string $indexName): array
     {
         if (!is_array($this->indexConfigurations)) {
             throw new \Exception('Index configuration must be an array but is ' . var_export($this->indexConfigurations, 1), 1569760272);
