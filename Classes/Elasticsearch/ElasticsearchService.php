@@ -8,10 +8,10 @@ namespace PunktDe\Analytics\Elasticsearch;
  *  All rights reserved.
  */
 
-use Elasticsearch\Common\Exceptions\Missing404Exception;
+use Elastic\Elasticsearch\Client;
+use Elastic\Elasticsearch\ClientBuilder;
+use Elastic\Elasticsearch\Exception\ClientResponseException;
 use Neos\Flow\Annotations as Flow;
-use Elasticsearch\Client;
-use Elasticsearch\ClientBuilder;
 use Neos\Flow\Log\Utility\LogEnvironment;
 use Neos\Flow\Reflection\ReflectionService;
 use Psr\Log\LoggerInterface;
@@ -62,9 +62,10 @@ class ElasticsearchService
 
         $templateName = $indexName . '_template';
 
-        $this->getClient()->indices()->putTemplate([
+        $this->getClient()->indices()->putIndexTemplate([
             'name' => $templateName,
-            'body' => $this->getIndexConfiguration($indexName)
+            'index_patterns' => [$indexName . '*'],
+            'template' => $this->getIndexConfiguration($indexName)
         ]);
 
         $this->logger->info(sprintf('Successfully transferred template %s', $templateName), LogEnvironment::fromMethodName(__METHOD__));
@@ -73,7 +74,10 @@ class ElasticsearchService
         try {
             $this->getClient()->indices()->delete(['index' => $indexPattern]);
             $this->logger->info(sprintf('Successfully removed indices with pattern %s', $indexPattern), LogEnvironment::fromMethodName(__METHOD__));
-        } catch (Missing404Exception $exception) {
+        } catch (ClientResponseException $exception) {
+            if ($exception->getResponse()->getStatusCode() !== 404) {
+                throw $exception;
+            }
             $this->logger->info(sprintf('Index with pattern %s could not be removed as it is not found', $indexPattern), LogEnvironment::fromMethodName(__METHOD__));
         }
     }

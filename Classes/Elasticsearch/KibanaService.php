@@ -8,9 +8,9 @@ namespace PunktDe\Analytics\Elasticsearch;
  *  All rights reserved.
  */
 
+use Elastic\Elasticsearch\Client;
+use Elastic\Elasticsearch\ClientBuilder;
 use Neos\Flow\Annotations as Flow;
-use Elasticsearch\Client;
-use Elasticsearch\ClientBuilder;
 
 /**
  * @Flow\Scope("singleton")
