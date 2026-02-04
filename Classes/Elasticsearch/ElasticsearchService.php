@@ -28,10 +28,34 @@ class ElasticsearchService
     private $client;
 
     /**
-     * @var array
-     * @Flow\InjectConfiguration(path="elasticsearch.server")
+     * @var string
+     * @Flow\InjectConfiguration(path="elasticsearch.server.scheme")
      */
-    protected $clientConfiguration;
+    protected $clientScheme;
+
+    /**
+     * @var string
+     * @Flow\InjectConfiguration(path="elasticsearch.server.host")
+     */
+    protected $clientHost;
+
+    /**
+     * @var int
+     * @Flow\InjectConfiguration(path="elasticsearch.server.port")
+     */
+    protected $clientPort;
+
+    /**
+     * @var string
+     * @Flow\InjectConfiguration(path="elasticsearch.server.user")
+     */
+    protected $clientUser;
+
+    /**
+     * @var string
+     * @Flow\InjectConfiguration(path="elasticsearch.server.pass")
+     */
+    protected $clientPassword;
 
     /**
      * @var array
@@ -88,9 +112,18 @@ class ElasticsearchService
     public function getClient(): Client
     {
         if ($this->client === null) {
-            $this->client = ClientBuilder::create()
-                ->setHosts([$this->clientConfiguration])
-                ->build();
+            $clientConfiguration = $this->clientConfiguration;
+
+            $hostString = sprintf('%s://%s:%s', $clientScheme, $clientHost, $clientPort);
+
+            $builder = ClientBuilder::create()
+                ->setHosts([$hostString]);
+
+            if (isset($clientUser, $clientPassword)) {
+                $builder->setBasicAuthentication($clientUser, $clientPassword);
+            }
+
+            $this->client = $builder->build();
         }
 
         return $this->client;
