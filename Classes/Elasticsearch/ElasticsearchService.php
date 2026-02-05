@@ -112,9 +112,7 @@ class ElasticsearchService
     public function getClient(): Client
     {
         if ($this->client === null) {
-            $clientConfiguration = $this->clientConfiguration;
-
-            $hostString = sprintf('%s://%s:%s', $clientScheme, $clientHost, $clientPort);
+            $hostString = sprintf('%s://%s:%s', $this->clientScheme, $this->clientHost, $this->clientPort);
 
             $builder = ClientBuilder::create()
                 ->setHosts([$hostString]);
