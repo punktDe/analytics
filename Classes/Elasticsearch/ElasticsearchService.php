@@ -117,8 +117,10 @@ class ElasticsearchService
             $builder = ClientBuilder::create()
                 ->setHosts([$hostString]);
 
-            if (isset($clientUser, $clientPassword)) {
-                $builder->setBasicAuthentication($clientUser, $clientPassword);
+            if (isset($this->clientUser, $this->clientPassword)) {
+                $builder->setBasicAuthentication($this->clientUser, $this->clientPassword);
+            } else {
+                $this->logger->warning('No credentials for elastic client found. Is this correct?', LogEnvironment::fromMethodName(__METHOD__));
             }
 
             $this->client = $builder->build();
