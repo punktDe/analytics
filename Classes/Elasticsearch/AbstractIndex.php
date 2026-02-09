@@ -8,7 +8,7 @@ namespace PunktDe\Analytics\Elasticsearch;
  *  All rights reserved.
  */
 
-use Elasticsearch\Client;
+use Elastic\Elasticsearch\Client;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Log\Utility\LogEnvironment;
 use Psr\Log\LoggerInterface;
