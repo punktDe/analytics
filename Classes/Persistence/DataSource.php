@@ -75,7 +75,7 @@ final class DataSource
         $this->entityManager = $this->entityManagerFactory->create();
 
         if ($this->entityManager->getConnection()->getDatabasePlatform()->getName() === 'mysql') {
-            $this->entityManager->getConnection()->getWrappedConnection()->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
+            $this->entityManager->getConnection()->getNativeConnection()->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
         }
 
         $this->connection = $this->entityManager->getConnection();
