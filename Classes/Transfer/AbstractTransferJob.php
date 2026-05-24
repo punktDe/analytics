@@ -135,7 +135,7 @@ class AbstractTransferJob
     protected function autoBulkIndex(array $document): void
     {
         $this->bulkIndexStorage['body'][] = [
-            'index' => [
+            'create' => [
                 '_index' => $document['index'],
                 '_id' => $document['id'] ?? null
             ]
@@ -163,7 +163,8 @@ class AbstractTransferJob
         }
 
         foreach ($result['items'] as $resultDocument) {
-            if ($resultDocument['index']['_shards']['failed'] ?? 1 !== 0) {
+            $item = $resultDocument['create'] ?? $resultDocument['index'] ?? [];
+            if (($item['_shards']['failed'] ?? 1) !== 0) {
                 $this->logger->error(sprintf('Ingesting a document in Elasticsearch failed. Details: %s', json_encode($resultDocument, JSON_THROW_ON_ERROR)));
             }
         }
