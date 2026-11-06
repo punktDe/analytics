@@ -1,6 +1,7 @@
 {
     "description": "",
     "type": "neos-package",
+    "license": "MIT",
     "name": "punktde/analytics",
     "require": {
         "neos/flow": "*",
